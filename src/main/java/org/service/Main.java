@@ -1,7 +1,5 @@
 package org.service;
 
-import java.util.Arrays;
-
 public class Main {
     
     final double adultTicket = 299.90;
@@ -16,18 +14,55 @@ public class Main {
                 {"17","18","19","20"}
         };
 
-        printBussSeats(myNumbers);
+        printBus(myNumbers);
     }
 
-    private static void printBussSeats(String[][] bussSeats) {
-        System.out.println("Night bus towards Japan.\n Available seats =");
-        System.out.printf("   %3s%n", "\\-/   \\-/");
-        System.out.print("___>-<___>-<___");
-        System.out.print("\n|_|______  _===:");
+    private static void printBus(String[][] bussSeats) {
+        printBusFront(bussSeats);
         for (int i = 0; i < bussSeats.length; i++) {
+            System.out.println();
             for (int j = 0; j < 4; j++) {
-
+                printBusSeats(bussSeats[i][j]);
+            }
+            if (i == 1) {
+                System.out.print("\n<<------------>>");
+            }else if (i == 3) {
+                System.out.print("\n<<------------>>");
             }
         }
+        printBusBack();
+    }
+
+    private static void printBusSeats(String seat) {
+        String bussSeat = String.format("|%2s|", seat);
+        System.out.print(bussSeat);
+    }
+    private static void printBusFront(String[][] bussSeats){
+        System.out.println(
+                "Night bus towards Japan." +
+                "\n" +
+                "Available seats = " + checkAvailableSeats(bussSeats));
+        System.out.printf("   %3s%n", "\\-/    \\-/");
+        System.out.print(" __>-<____>-<__");
+        System.out.print("\n/___|----------\\");
+        System.out.print("\n|_D_|__/   _===:");
+    }
+    private static void printBusBack(){
+        System.out.println("\n|--------------|");
+        System.out.println("\\--------------/");
+        System.out.println(" \\-/_\\----/_\\-/");
+    }
+
+    private static int checkAvailableSeats(String[][] bussSeats) {
+        int sum = 0;
+        for (int i = 0; i < bussSeats.length; i++) {
+            for (int j = 0; j < 4; j++) {
+                if (!bussSeats[i][j].equals("X")) {
+                    sum += 1;
+                }
+            }
+        }
+
+        return sum;
     }
 }
