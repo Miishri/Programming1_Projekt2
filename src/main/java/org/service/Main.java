@@ -16,11 +16,17 @@ public class Main {
                 {"17","18","19","20"}
         };
         startBusService(bussSeats);
-
     }
 
     public static void startBusService(String[][] bussSeats) {
-        printBus(bussSeats);
+        while (true) {
+            printBus(bussSeats);
+            if (validateRole()) {
+                busInspectorChoices(bussSeats);
+            }else {
+
+            }
+        }
     }
     public static void inputValidator(int choice) {
         switch (choice) {
@@ -30,42 +36,85 @@ public class Main {
         }
     }
 
-    public static int customerBusSeatChoice() {
+    public static void customerBusSeatChoices() {
         while (true) {
-            System.out.println("0. Exit");
-            System.out.println("1. Book seat");
-            System.out.println("2. Find your booking ");
-
+            System.out.println("0.Exit");
+            System.out.println("1.Book seat");
+            System.out.println("2.Find your booking ");
+            System.out.println("> ");
             int choice = scanner.nextInt();
-        }
-    }
-    public static void busWindowSeatChoice(int choice) {
-        if (choice == 1) {
-            System.out.println("Window seats unbooked are: " );
-            System.out.println("1. Which seat to book? (1-20)");
-        }
-    }
 
-    public static void unbookedWindowSeats(String[][] busSeats) {
-
-    }
-
-    public static int validateRole() {
-        while (true) {
-            System.out.println("1.Bus Inspector ");
-            System.out.println("2.Customer ");
-
-            int choice = scanner.nextInt();
-            if (choice == 1) {
-                return 1;
+            if (choice == 0) {
+                System.out.println("Thank you for using our service!");
+                break;
+            }else if (choice == 1) {
+                busWindowSeatChoice();
+                break;
             }else if (choice == 2) {
-                return 2;
+
             }
         }
     }
+    public static void busInspectorChoices(String[][] busSeats) {
+        while (true) {
+            System.out.println("0.Exit");
+            System.out.println("1.Check profit");
+            System.out.println("2.Sort customers");
 
-    public static void bookedSeatDetails(String firstName, String lastName, String dateOfBirth, int busNumber) {
+            int choice = scanner.nextInt();
+            if (choice == 0) {
+                break;
+            }else if (choice == 1) {
+                System.out.println("Current profit is " + getTotalProfit(busSeats, 0, 0, 0.0) + " KR");
+            }else if (choice == 2) {
 
+            }
+        }
+    }
+    public static void busWindowSeatChoice() {
+        while (true) {
+            System.out.println("Window seats unbooked are:" + unbookedWindowSeats);
+            System.out.println("1. Which seat to book? (1-20)");
+            System.out.println("> ");
+
+            int choice = scanner.nextInt();
+
+            if (choice >= 1 && choice <= 20) {
+
+            }
+        }
+
+    }
+
+    public static String unbookedWindowSeats(String[][] busSeats) {
+        StringBuilder windowSeats = new StringBuilder();
+        for (int i = 0; i < busSeats.length; i++) {
+            for (int j = 0; j < 4; j += 3) {
+                if (!busSeats[i][j].equals("X")){
+                    windowSeats.append(" ").append(busSeats[i][j]);
+                }
+            }
+        }
+
+        return windowSeats.toString();
+    }
+
+    public static boolean validateRole() {
+        while (true) {
+            System.out.println("1.Bus Inspector ");
+            System.out.println("2.Customer ");
+            System.out.println("> ");
+            int choice = scanner.nextInt();
+
+            if (choice == 1) {
+                return true;
+            }else if (choice == 2) {
+                return false;
+            }
+        }
+    }
+    public static String bookedSeatDetailsFormatted(String firstName, String lastName, String dateOfBirth, int busNumber) {
+        return firstName + "," + lastName + "," + formatDateOfBirth(dateOfBirth) + "," + busNumber;
     }
     public static int checkAvailableSeats(String[][] bussSeats) {
         int availableSeats = 0;
@@ -76,7 +125,6 @@ public class Main {
                 }
             }
         }
-
         return availableSeats;
     }
     public static String bookedSeatCheck(String seat) {
@@ -103,7 +151,6 @@ public class Main {
             return profit;
         }
 
-
         if (!currentAgeCheck(bookedSeats[rows][columns])) {
             return getTotalProfit(bookedSeats, rows + 1, columns + 1, profit + juvenileBusTicket);
         }
@@ -114,7 +161,6 @@ public class Main {
     public static String[] splittedString(String seat) {
         return seat.split(",");
     }
-
     public static void printBus(String[][] bussSeats) {
         printBusFrontFrame(bussSeats);
         printBusInteriorLayout(bussSeats);
@@ -156,6 +202,6 @@ public class Main {
     public static void printBusBackFrame(){
         System.out.println("\n|--------------|");
         System.out.println("\\--------------/");
-        System.out.println(" \\-/_\\----/_\\-/");
+        System.out.println(" \\-/_\\----/_\\-/\n");
     }
 }
