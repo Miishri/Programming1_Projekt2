@@ -4,25 +4,24 @@ import java.time.Year;
 import java.util.Scanner;
 
 public class Main {
-    static final double adultBusTicket = 299.90;
-    static final double juvenileBusTicket = 149.90;
     static Scanner scanner = new Scanner(System.in);
+    static String[][] busSeats = {
+            {"1","2","3","4"},
+            {"5","6","7","8"},
+            {"9","10","11","12"},
+            {"13","14","15","16"},
+            {"17","18","19","20"}
+    };
     public static void main(String[] args) {
-        String[][] bussSeats = {
-                {"1","2","3","4"},
-                {"5","6","7","8"},
-                {"9","10","11","12"},
-                {"13","14","15","16"},
-                {"17","18","19","20"}
-        };
-        startBusService(bussSeats);
+
+        startBusService();
     }
 
-    public static void startBusService(String[][] bussSeats) {
+    public static void startBusService() {
         while (true) {
-            printBus(bussSeats);
+            printBus();
             if (validateRole()) {
-                busInspectorChoices(bussSeats);
+                busInspectorChoices();
             }else {
 
             }
@@ -55,7 +54,7 @@ public class Main {
             }
         }
     }
-    public static void busInspectorChoices(String[][] busSeats) {
+    public static void busInspectorChoices() {
         while (true) {
             System.out.println("0.Exit");
             System.out.println("1.Check profit");
@@ -71,9 +70,13 @@ public class Main {
             }
         }
     }
+
+    public static void sortCustomers() {
+
+    }
     public static void busWindowSeatChoice() {
         while (true) {
-            System.out.println("Window seats unbooked are:" + unbookedWindowSeats);
+            System.out.println("Window seats unbooked are:" + unbookedWindowSeats());
             System.out.println("1. Which seat to book? (1-20)");
             System.out.println("> ");
 
@@ -86,7 +89,7 @@ public class Main {
 
     }
 
-    public static String unbookedWindowSeats(String[][] busSeats) {
+    public static String unbookedWindowSeats() {
         StringBuilder windowSeats = new StringBuilder();
         for (int i = 0; i < busSeats.length; i++) {
             for (int j = 0; j < 4; j += 3) {
@@ -114,13 +117,13 @@ public class Main {
         }
     }
     public static String bookedSeatDetailsFormatted(String firstName, String lastName, String dateOfBirth, int busNumber) {
-        return firstName + "," + lastName + "," + formatDateOfBirth(dateOfBirth) + "," + busNumber;
+        return "X," + firstName + "," + lastName + "," + formatDateOfBirth(dateOfBirth) + "," + busNumber;
     }
-    public static int checkAvailableSeats(String[][] bussSeats) {
+    public static int checkAvailableSeats() {
         int availableSeats = 0;
-        for (int i = 0; i < bussSeats.length; i++) {
+        for (int i = 0; i < busSeats.length; i++) {
             for (int j = 0; j < 4; j++) {
-                if (!splittedString(bussSeats[i][j])[0].equals("X")) {
+                if (!splittedString(busSeats[i][j])[0].equals("X")) {
                     availableSeats += 1;
                 }
             }
@@ -152,25 +155,25 @@ public class Main {
         }
 
         if (!currentAgeCheck(bookedSeats[rows][columns])) {
-            return getTotalProfit(bookedSeats, rows + 1, columns + 1, profit + juvenileBusTicket);
+            return getTotalProfit(bookedSeats, rows + 1, columns + 1, profit + 149.90);
         }
 
-        return getTotalProfit(bookedSeats, rows + 1, columns + 1, profit + adultBusTicket);
+        return getTotalProfit(bookedSeats, rows + 1, columns + 1, profit + 299.90);
     }
 
     public static String[] splittedString(String seat) {
         return seat.split(",");
     }
-    public static void printBus(String[][] bussSeats) {
-        printBusFrontFrame(bussSeats);
-        printBusInteriorLayout(bussSeats);
+    public static void printBus() {
+        printBusFrontFrame();
+        printBusInteriorLayout();
         printBusBackFrame();
     }
-    public static void printBusInteriorLayout(String[][] bussSeats) {
-        for (int i = 0; i < bussSeats.length; i++) {
+    public static void printBusInteriorLayout() {
+        for (int i = 0; i < busSeats.length; i++) {
             System.out.println();
             for (int j = 0; j < 4; j++) {
-                printFormattedBusSeats(bussSeats[i][j]);
+                printFormattedBusSeats(busSeats[i][j]);
             }
             printWheels(i);
         }
@@ -182,11 +185,11 @@ public class Main {
             System.out.printf("|%2s", bookedSeatCheck(seat));
         }
     }
-    public static void printBusFrontFrame(String[][] bussSeats){
+    public static void printBusFrontFrame(){
         System.out.println(
                 "Night bus towards Japan." +
                 "\n" +
-                "Available seats = " + checkAvailableSeats(bussSeats));
+                "Available seats = " + checkAvailableSeats());
         System.out.printf("   %3s%n", "\\-/    \\-/");
         System.out.print(" __>-<____>-<__");
         System.out.print("\n/___|----------\\");
