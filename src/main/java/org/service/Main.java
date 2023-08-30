@@ -1,6 +1,8 @@
 package org.service;
 
+import java.sql.SQLOutput;
 import java.time.Year;
+import java.util.Arrays;
 import java.util.Scanner;
 
 public class Main {
@@ -13,7 +15,6 @@ public class Main {
             {"17","18","19","20"}
     };
     public static void main(String[] args) {
-
         startBusService();
     }
 
@@ -23,7 +24,7 @@ public class Main {
             if (validateRole()) {
                 busInspectorChoices();
             }else {
-
+                customerBusSeatChoices();
             }
         }
     }
@@ -40,7 +41,7 @@ public class Main {
             System.out.println("0.Exit");
             System.out.println("1.Book seat");
             System.out.println("2.Find your booking ");
-            System.out.println("> ");
+            System.out.print("> ");
             int choice = scanner.nextInt();
 
             if (choice == 0) {
@@ -48,7 +49,6 @@ public class Main {
                 break;
             }else if (choice == 1) {
                 busWindowSeatChoice();
-                break;
             }else if (choice == 2) {
 
             }
@@ -59,12 +59,14 @@ public class Main {
             System.out.println("0.Exit");
             System.out.println("1.Check profit");
             System.out.println("2.Sort customers");
+            System.out.println("> ");
 
             int choice = scanner.nextInt();
             if (choice == 0) {
                 break;
             }else if (choice == 1) {
-                System.out.println("Current profit is " + getTotalProfit(busSeats, 0, 0, 0.0) + " KR");
+                double profit = getTotalProfit(busSeats, 0, 0, 0.0);
+                System.out.println("Current profit is " + profit + " KR");
             }else if (choice == 2) {
 
             }
@@ -78,25 +80,54 @@ public class Main {
         while (true) {
             System.out.println("Window seats unbooked are:" + unbookedWindowSeats());
             System.out.println("1. Which seat to book? (1-20)");
-            System.out.println("> ");
+            System.out.print("> ");
 
             int choice = scanner.nextInt();
 
             if (choice >= 1 && choice <= 20) {
+                System.out.print("First name: ");
+                String firstName = scanner.next();
 
+                System.out.print("Last name: ");
+                String lastName = scanner.next();
+
+                System.out.print("Birth date(YYYYMMDD): ");
+                String dateOfBirth = scanner.next();
+                if (!(dateOfBirth.length() < 8)) {
+                    String details = bookedSeatDetailsFormatted(firstName, lastName, dateOfBirth, choice);
+                    bookSeat(details);
+                    System.out.println("Thank you for the booking, " + getFullName(details));
+                    System.out.println(details);
+                    break;
+                }else {
+                    System.out.println("Details provided were incorrect.");
+                }
             }
         }
 
     }
 
+    public static void bookSeat(String seat) {
+        for (int i = 0; i < busSeats.length; i++) {
+            for (int j = 0; j < 4; j++) {
+                if (busSeats[i][j].equals(getSeat(seat))) {
+                    busSeats[i][j] = seat;
+                }
+            }
+        }
+    }
     public static String unbookedWindowSeats() {
         StringBuilder windowSeats = new StringBuilder();
         for (int i = 0; i < busSeats.length; i++) {
             for (int j = 0; j < 4; j += 3) {
-                if (!busSeats[i][j].equals("X")){
+                if (!splittedString(busSeats[i][j])[0].equals("X")){
                     windowSeats.append(" ").append(busSeats[i][j]);
                 }
             }
+        }
+
+        if (windowSeats.isEmpty()) {
+            windowSeats.append(" No window seats are left.");
         }
 
         return windowSeats.toString();
@@ -106,7 +137,7 @@ public class Main {
         while (true) {
             System.out.println("1.Bus Inspector ");
             System.out.println("2.Customer ");
-            System.out.println("> ");
+            System.out.print("> ");
             int choice = scanner.nextInt();
 
             if (choice == 1) {
@@ -136,13 +167,23 @@ public class Main {
     public static String getFullName(String seat) {
         return splittedString(seat)[1] + " " + splittedString(seat)[2];
     }
-    public static boolean currentAgeCheck(String seat) {
-        int dateOfBirth = Integer.parseInt(splittedString(seat)[3].split("-")[2]);
-        int currentYear = Year.now().getValue();
-        return currentYear - dateOfBirth >= 18;
+    public static int currentAgeCheck(String seat) {
+        if (seat.length() > 2) {
+            System.out.println(splittedString(seat)[3]);
+            int dateOfBirth = Integer.parseInt(splittedString(seat)[3].split("-")[0]);
+            int currentYear = Year.now().getValue();
+
+            if (currentYear - dateOfBirth >= 18) {
+                return 0;
+            }else {
+                return 1;
+            }
+        }
+
+        return 2;
     }
-    public static int getSeat(String seat) {
-        return Integer.parseInt(splittedString(seat)[4]);
+    public static String getSeat(String seat) {
+        return splittedString(seat)[4];
     }
     public static String formatDateOfBirth(String dateOfBirth) {
         return dateOfBirth.substring(0, 4) + "-" +
@@ -150,17 +191,22 @@ public class Main {
                 dateOfBirth.substring(6, 8);
     }
     public static double getTotalProfit(String[][] bookedSeats, int rows, int columns, double profit) {
-        if (rows > bookedSeats.length) {
+        if (rows >= bookedSeats.length) {
             return profit;
         }
 
-        if (!currentAgeCheck(bookedSeats[rows][columns])) {
-            return getTotalProfit(bookedSeats, rows + 1, columns + 1, profit + 149.90);
+        if (columns > 3) {
+            return getTotalProfit(bookedSeats, rows + 1, 0, profit);
         }
 
-        return getTotalProfit(bookedSeats, rows + 1, columns + 1, profit + 299.90);
-    }
+        if (currentAgeCheck(bookedSeats[rows][columns]) == 0) {
+            return getTotalProfit(bookedSeats, rows, columns + 1, profit + 149.90);
+        }else if (currentAgeCheck(bookedSeats[rows][columns]) == 1){
+            getTotalProfit(bookedSeats, rows, columns + 1, profit + 299.90);
+        }
 
+        return getTotalProfit(bookedSeats, rows, columns + 1, profit);
+    }
     public static String[] splittedString(String seat) {
         return seat.split(",");
     }
