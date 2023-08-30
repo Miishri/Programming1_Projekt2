@@ -18,22 +18,35 @@ public class Main {
         startBusService();
     }
 
+    /**
+     * Initiates the bus service and handles user interactions.
+     * Displays the bus layout, validates user role, and directs to the corresponding actions.
+     */
     public static void startBusService() {
         while (true) {
             printBus();
-            if (validateRole()) {
+            int roleValidator = validateRole();
+            if (roleValidator == 1) {
                 busInspectorChoices();
-            }else {
+            }else if (roleValidator == 2){
                 customerBusSeatChoices();
+            }else {
+                System.out.println("Thank you for using our service!");
+                break;
             }
         }
     }
 
+    /**
+     * Menu of choices for the customer's bus seat actions.
+     * Displays menu options, takes user input, and performs actions according to it.
+     */
     public static void customerBusSeatChoices() {
         while (true) {
             System.out.println("0.Exit");
             System.out.println("1.Book seat");
             System.out.println("2.Find your booking ");
+            System.out.println("3.Show bus");
             System.out.print("> ");
             int choice = scanner.nextInt();
 
@@ -44,31 +57,77 @@ public class Main {
                 busWindowSeatChoice();
             }else if (choice == 2) {
 
+            }else if (choice == 3) {
+                printBus();
             }
         }
     }
 
+    public static void findCustomerBooked() {
+        while (true) {
+            System.out.print("Please provide your birthdate(YYYYMMDD): ");
+            String dateOfBirth = scanner.next();
+            if (dateOfBirth.length() == 8) {
+                System.out.println(findCustomerData(formatDateOfBirth(dateOfBirth)));
+            }
+        }
+    }
+
+    public static String findCustomerData(String birthdate) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String[] busSeat : busSeats) {
+            for (int j = 0; j < 4; j += 3) {
+                String data = busSeat[j];
+                if (splittedString(data)[0].equals("X")) {
+                    if (splittedString(data)[0].equals(formatDateOfBirth(birthdate))) {
+                        stringBuilder.append(formattedCustomerDetails(data));
+                        break;
+                    }
+                }
+            }
+        }
+
+        return stringBuilder.toString();
+    }
+
+    /**
+     * Menu of choices for the Bus Inspector role.
+     * Displays menu options, takes user input, and performs actions according to it.
+     * Check profit calls recursive function to get the total profit made.
+     * Sort customers uses recursive
+     */
     public static void busInspectorChoices() {
         while (true) {
             System.out.println("0.Exit");
             System.out.println("1.Check profit");
             System.out.println("2.Sort customers");
+            System.out.println("3.Show bus seats");
             System.out.println("> ");
 
             int choice = scanner.nextInt();
             if (choice == 0) {
                 break;
             }else if (choice == 1) {
-                double profit = getTotalProfit(busSeats, 0, 0, 0.0);
+                double profit = getTotalProfit(0, 0, 0.0);
                 System.out.println("Current profit is " + profit + " KR");
             }else if (choice == 2) {
 
+            }else if (choice == 3) {
+                printBus();
             }
         }
     }
+
+
     public static void sortCustomers() {
 
     }
+
+
+    /**
+     * Processes booking of a window seat in the bus.
+     * Displays unbooked window seats, takes user input for seat choice, and processes customer details for booking the seat and books it.
+     */
     public static void busWindowSeatChoice() {
         while (true) {
             System.out.println("Window seats unbooked are:" + unbookedWindowSeats());
@@ -86,20 +145,41 @@ public class Main {
 
                 System.out.print("Birth date(YYYYMMDD): ");
                 String dateOfBirth = scanner.next();
-                if (!(dateOfBirth.length() < 8)) {
-                    String details = bookedSeatDetailsFormatted(firstName, lastName, dateOfBirth, choice);
-                    bookSeat(details);
-                    System.out.println("Thank you for the booking, " + getFullName(details));
-                    System.out.println(details);
+                if (customerDetails(firstName, lastName, dateOfBirth, choice)) {
                     break;
-                }else {
-                    System.out.println("Details provided were incorrect.");
                 }
             }
         }
 
     }
 
+    /**
+     * Concatenates customer details for seat booking.
+     * Validates format of date of birth and if valid, formats, prints and books the seat. Returns `true` on success
+     *
+     * @param firstName First name of the customer.
+     * @param lastName Last name of the customer.
+     * @param dateOfBirth Date of birth of the customer.
+     * @param choice Seat choice.
+     * @return `true` if valid details and booked seat, otherwise `false`.
+     */
+    public static boolean customerDetails(String firstName, String lastName, String dateOfBirth, int choice) {
+        if (!(dateOfBirth.length() < 8)) {
+            String details = bookedSeatDetailsFormatted(firstName, lastName, dateOfBirth, choice);
+            bookSeat(details);
+            System.out.println("Thank you for the booking, " + getFullName(details));
+            System.out.println(formattedCustomerDetails(details));;
+            return true;
+        }
+        System.out.println("Details provided were incorrect.");
+        return false;
+    }
+
+
+    /**
+     * Books a specific seat in the bus layout.
+     * @param seat The seat to be booked.
+     */
     public static void bookSeat(String seat) {
         for (int i = 0; i < busSeats.length; i++) {
             for (int j = 0; j < 4; j++) {
@@ -109,6 +189,12 @@ public class Main {
             }
         }
     }
+
+
+    /**
+     * Retrieves unbooked window seats from the bus layout.
+     * @return An appended string containing unbooked window seats or a message if none are available.
+     */
     public static String unbookedWindowSeats() {
         StringBuilder windowSeats = new StringBuilder();
         for (int i = 0; i < busSeats.length; i++) {
@@ -126,23 +212,49 @@ public class Main {
         return windowSeats.toString();
     }
 
-    public static boolean validateRole() {
+    /**
+     * Validates and returns the user role.
+     * Displays role options (1.Bus Inspector or 2.Customer), takes user input to return boolean values.
+     *
+     * @return `1` for Bus Inspector, `2` for Customer, '0' to Exit
+     */
+    public static int validateRole() {
         while (true) {
+            System.out.println("0.Exit ");
             System.out.println("1.Bus Inspector ");
             System.out.println("2.Customer ");
             System.out.print("> ");
             int choice = scanner.nextInt();
 
             if (choice == 1) {
-                return true;
+                return 1;
             }else if (choice == 2) {
-                return false;
+                return 2;
+            }else {
+                break;
             }
         }
+        return 0;
     }
+
+    /**
+     * Formats and creates a booked seat CSV details string.
+     *
+     * @param firstName First name of the passenger.
+     * @param lastName Last name of the passenger.
+     * @param dateOfBirth Date of birth of the passenger. (YYYYMMDD)
+     * @param busNumber Bus number associated with the booking.
+     * @return Formatted string containing booked seat details.
+     */
     public static String bookedSeatDetailsFormatted(String firstName, String lastName, String dateOfBirth, int busNumber) {
         return "X," + firstName + "," + lastName + "," + formatDateOfBirth(dateOfBirth) + "," + busNumber;
     }
+
+    /**
+     * Counts the number of available seats in the bus.
+     *
+     * @return number of available seats.
+     */
     public static int checkAvailableSeats() {
         int availableSeats = 0;
         for (int i = 0; i < busSeats.length; i++) {
@@ -154,12 +266,37 @@ public class Main {
         }
         return availableSeats;
     }
+
+
+    /**
+     * Checks if a seat is booked.
+     *
+     * @param seat Seat CSV containing booking confirmation.
+     * @return Booking status of the seat.
+     */
     public static String bookedSeatCheck(String seat) {
         return splittedString(seat)[0];
     }
+
+    /**
+     * Extracts full name from seat String CSV .
+     *
+     * @param seat Seat CSV containing name information.
+     * @return Concatenated first name and last name.
+     */
     public static String getFullName(String seat) {
         return splittedString(seat)[1] + " " + splittedString(seat)[2];
     }
+
+    /**
+     * Checks the age based on the birth year extracted from a csv seat details String.
+     *
+     * If seat has more than 2 characters, it extracts the birth year from the
+     * seat information using the splittedString() method and calculates age.
+     *
+     * @param seat The seat representation containing CSV formatted details.
+     * @return 0 if the calculated age is 18 or older, 1 if it's younger than 18, and 2 if unable to determine.
+     */
     public static int currentAgeCheck(String seat) {
         if (seat.length() > 2) {
             System.out.println(splittedString(seat)[3]);
@@ -177,55 +314,68 @@ public class Main {
     }
 
     /**
-     *
+     * Takes in a CSV formatted String and calls the method splitString() for the array, then fetches the booked bus seat number.
+     * @param seat CSV formatted String containing seat information.
+     * @return Returns the booked seat number.
      * */
     public static String getSeat(String seat) {
         return splittedString(seat)[4];
     }
 
     /**
-     * Takes in a string that is formatted in csv to extract date of birth (YYYYMMDD) and reformat to (YYYY-MM-DD)
-     * @param dateOfBirth csv formatted details about the customer
-     * @return returns the reformatted date of birth back
-     * */
+     * Takes in a string that is formatted in CSV to extract the date of birth (YYYYMMDD) and reformat it to (YYYY-MM-DD).
+     * @param dateOfBirth CSV formatted details about the customer.
+     * @return Returns the reformatted date of birth.
+     */
     public static String formatDateOfBirth(String dateOfBirth) {
         return dateOfBirth.substring(0, 4) + "-" +
                 dateOfBirth.substring(4, 6) + "-" +
                 dateOfBirth.substring(6, 8);
     }
 
+
     /**
-     * Recursively calls itself to calculate the profit inside 2d array, uses currentAgeCheck() to calculate profit
-     * @param rows row starts with the value of 0 till array.Length
-     * @param columns each column inside the current value of row accessed through the 2d array
-     * @param profit carries the total profit
-     * @return returns the profit in a primitive type of double back
-     * */
-    public static double getTotalProfit(int rows, int columns, double profit) {
-        if (rows >= busSeats.length) {
-            return profit;
-        }
-
-        if (columns > 3) {
-            return getTotalProfit(rows + 1, 0, profit);
-        }
-
-        if (currentAgeCheck(busSeats[rows][columns]) == 0) {
-            return getTotalProfit(rows, columns + 1, profit + 149.90);
-        }else if (currentAgeCheck(busSeats[rows][columns]) == 1){
-            getTotalProfit(rows, columns + 1, profit + 299.90);
-        }
-
-        return getTotalProfit(rows, columns + 1, profit);
+     * Prints full name, birthdate, and seat number formatted from customer details extracted from CSV string
+     * @param csvString CSV string containing customer details.
+     */
+    public static String formattedCustomerDetails(String csvString) {
+        return "Name: " + getFullName(csvString) +
+                "\nBirthdate: "  + splittedString(csvString)[3]+
+                "\nSeat: " + getSeat(csvString);
     }
 
     /**
-     * This method splits String that has multiple values saved into it with csv format
-     * @param seat takes in a csv format string
-     * @return returns the string split into an array
-     * */
-    public static String[] splittedString(String seat) {
-        return seat.split(",");
+     * Recursively calculates the profit within a 2D array using the currentAgeCheck() function.
+     * @param row The current row index, starting from 0 up to array.length.
+     * @param column The current column index within the row, accessed through the 2D array.
+     * @param profit The total profit calculated so far.
+     * @return The calculated profit as a double value.
+     */
+    public static double getTotalProfit(int row, int column, double profit) {
+        if (row >= busSeats.length) {
+            return profit;
+        }
+
+        if (column > 3) {
+            return getTotalProfit(row + 1, 0, profit);
+        }
+
+        if (currentAgeCheck(busSeats[row][column]) == 0) {
+            return getTotalProfit(row, column + 1, profit + 149.90);
+        }else if (currentAgeCheck(busSeats[row][column]) == 1){
+            getTotalProfit(row, column + 1, profit + 299.90);
+        }
+
+        return getTotalProfit(row, column + 1, profit);
+    }
+
+    /**
+     * Splits a comma-separated value (CSV) formatted string into an array of individual values.
+     * @param csvSeatDetails The input string in CSV format.
+     * @return An array containing the individual values split from the CSV string.
+     */
+    public static String[] splittedString(String csvSeatDetails) {
+        return csvSeatDetails.split(",");
     }
 
 
@@ -239,14 +389,12 @@ public class Main {
     }
 
     /**
-     * Print the bus seats by looping through each row and column inside the globalized 2D bus seats array.
+     * Prints the arranged bus seats by iterating through each row and column in the static 2D bus seats array.
      * <pre>
-     *     Prints a new line in the first loop and calls printFormattedBusSeats() with each value of 2d array provided
+     *     This method prints a new line at the beginning of each row iteration and invokes the printFormattedBusSeats() method for each value in the 2D array.
      * </pre>
-     *<pre>
-     *     calls the printWheels() method after second loop ends
-     *</pre>
-     * */
+     * After the second loop completes, the printWheels() method is called.
+     */
     public static void printBusInteriorLayout() {
         for (int i = 0; i < busSeats.length; i++) {
             System.out.println();
@@ -258,12 +406,11 @@ public class Main {
     }
 
     /**
-     * Converts a string of seat that is either a number or X
+     * Converts a seat string, which can be either a number or 'X', into a formatted string.
      * <pre>
-     *     It is formatted with minimum 2 spaces of width and printed out with System.out.printf()
+     *     The formatted string is printed using System.out.printf() with a minimum width of 2 spaces.
      * </pre>
-     *
-     * @param seat
+     * @param seat The seat representation to be converted and formatted.
      */
     public static void printFormattedBusSeats(String seat) {
         if (seat.length() <= 2 && !seat.isEmpty()) {
@@ -288,13 +435,14 @@ public class Main {
     }
 
     /**
-     *Print out the wheels depending on the row.
      * <pre>
-     *     If row == 0 then it prints after the first row,
-     *      else if row == 3 it prints before the last row
+     *     Prints out the wheels at specific rows in the arranged bus seats.
      * </pre>
-     *
-     * @param row current row of the 2d array with seats
+     * <pre>
+     *     If the provided row index is 0, the wheels are printed after the first row.
+     *     If the row index is 3, the wheels are printed before the last row.
+     * </pre>
+     * @param row The current row index in the 2D seats array.
      */
     public static void printWheels(int row) {
         if (row == 0) {
