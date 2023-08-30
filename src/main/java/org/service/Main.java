@@ -28,13 +28,6 @@ public class Main {
             }
         }
     }
-    public static void inputValidator(int choice) {
-        switch (choice) {
-            case 1:
-            case 2:
-
-        }
-    }
 
     public static void customerBusSeatChoices() {
         while (true) {
@@ -54,6 +47,7 @@ public class Main {
             }
         }
     }
+
     public static void busInspectorChoices() {
         while (true) {
             System.out.println("0.Exit");
@@ -72,7 +66,6 @@ public class Main {
             }
         }
     }
-
     public static void sortCustomers() {
 
     }
@@ -182,39 +175,78 @@ public class Main {
 
         return 2;
     }
+
+    /**
+     *
+     * */
     public static String getSeat(String seat) {
         return splittedString(seat)[4];
     }
+
+    /**
+     * Takes in a string that is formatted in csv to extract date of birth (YYYYMMDD) and reformat to (YYYY-MM-DD)
+     * @param dateOfBirth csv formatted details about the customer
+     * @return returns the reformatted date of birth back
+     * */
     public static String formatDateOfBirth(String dateOfBirth) {
         return dateOfBirth.substring(0, 4) + "-" +
                 dateOfBirth.substring(4, 6) + "-" +
                 dateOfBirth.substring(6, 8);
     }
-    public static double getTotalProfit(String[][] bookedSeats, int rows, int columns, double profit) {
-        if (rows >= bookedSeats.length) {
+
+    /**
+     * Recursively calls itself to calculate the profit inside 2d array, uses currentAgeCheck() to calculate profit
+     * @param rows row starts with the value of 0 till array.Length
+     * @param columns each column inside the current value of row accessed through the 2d array
+     * @param profit carries the total profit
+     * @return returns the profit in a primitive type of double back
+     * */
+    public static double getTotalProfit(int rows, int columns, double profit) {
+        if (rows >= busSeats.length) {
             return profit;
         }
 
         if (columns > 3) {
-            return getTotalProfit(bookedSeats, rows + 1, 0, profit);
+            return getTotalProfit(rows + 1, 0, profit);
         }
 
-        if (currentAgeCheck(bookedSeats[rows][columns]) == 0) {
-            return getTotalProfit(bookedSeats, rows, columns + 1, profit + 149.90);
-        }else if (currentAgeCheck(bookedSeats[rows][columns]) == 1){
-            getTotalProfit(bookedSeats, rows, columns + 1, profit + 299.90);
+        if (currentAgeCheck(busSeats[rows][columns]) == 0) {
+            return getTotalProfit(rows, columns + 1, profit + 149.90);
+        }else if (currentAgeCheck(busSeats[rows][columns]) == 1){
+            getTotalProfit(rows, columns + 1, profit + 299.90);
         }
 
-        return getTotalProfit(bookedSeats, rows, columns + 1, profit);
+        return getTotalProfit(rows, columns + 1, profit);
     }
+
+    /**
+     * This method splits String that has multiple values saved into it with csv format
+     * @param seat takes in a csv format string
+     * @return returns the string split into an array
+     * */
     public static String[] splittedString(String seat) {
         return seat.split(",");
     }
+
+
+    /**
+     * Calls printBusFrontFrame(), printBusInteriorLayout() and printBusBackFrame() to create the bus layout including the seat numbers
+     * */
     public static void printBus() {
         printBusFrontFrame();
         printBusInteriorLayout();
         printBusBackFrame();
     }
+
+    /**
+     * Print the bus seats by looping through each row and column inside the globalized 2D bus seats array.
+     * <pre>
+     *     Prints a new line in the first loop and calls printFormattedBusSeats() with each value of 2d array provided
+     * </pre>
+     *<pre>
+     *     calls the printWheels() method after second loop ends
+     *</pre>
+     * */
     public static void printBusInteriorLayout() {
         for (int i = 0; i < busSeats.length; i++) {
             System.out.println();
@@ -224,6 +256,15 @@ public class Main {
             printWheels(i);
         }
     }
+
+    /**
+     * Converts a string of seat that is either a number or X
+     * <pre>
+     *     It is formatted with minimum 2 spaces of width and printed out with System.out.printf()
+     * </pre>
+     *
+     * @param seat
+     */
     public static void printFormattedBusSeats(String seat) {
         if (seat.length() <= 2 && !seat.isEmpty()) {
             System.out.printf("|%2s|", seat);
@@ -231,6 +272,10 @@ public class Main {
             System.out.printf("|%2s", bookedSeatCheck(seat));
         }
     }
+
+    /**
+     * Print the front of the bus through System.out.printf() and shows available seats using checkAvailableSeats()
+     * */
     public static void printBusFrontFrame(){
         System.out.println(
                 "Night bus towards Japan." +
@@ -241,13 +286,28 @@ public class Main {
         System.out.print("\n/___|----------\\");
         System.out.print("\n|_D_|__/   _===:");
     }
-    public static void printWheels(int seat) {
-        if (seat == 0) {
+
+    /**
+     *Print out the wheels depending on the row.
+     * <pre>
+     *     If row == 0 then it prints after the first row,
+     *      else if row == 3 it prints before the last row
+     * </pre>
+     *
+     * @param row current row of the 2d array with seats
+     */
+    public static void printWheels(int row) {
+        if (row == 0) {
             System.out.print("\n()------------()");
-        }else if (seat == 3) {
+        }else if (row == 3) {
             System.out.print("\n()------------()");
         }
     }
+
+
+    /**
+     * Print the front of the bus through multiple System.out.println()
+     * */
     public static void printBusBackFrame(){
         System.out.println("\n|--------------|");
         System.out.println("\\--------------/");
