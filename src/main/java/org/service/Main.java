@@ -5,6 +5,9 @@ import java.time.Year;
 import java.util.Arrays;
 import java.util.Scanner;
 
+/**
+ * The main class for the bus service program.
+ */
 public class Main {
     static Scanner scanner = new Scanner(System.in);
     static String[][] busSeats = {
@@ -14,6 +17,11 @@ public class Main {
             {"13","14","15","16"},
             {"17","18","19","20"}
     };
+
+    /**
+     * Start point for the bus service program.
+     * @param args CL arguments passed to the program.
+     */
     public static void main(String[] args) {
         startBusService();
     }
@@ -48,43 +56,64 @@ public class Main {
             System.out.println("2.Find your booking ");
             System.out.println("3.Show bus");
             System.out.print("> ");
-            int choice = scanner.nextInt();
+            try {
+                int choice = scanner.nextInt();
 
-            if (choice == 0) {
-                System.out.println("Thank you for using our service!");
-                break;
-            }else if (choice == 1) {
-                busWindowSeatChoice();
-            }else if (choice == 2) {
-
-            }else if (choice == 3) {
-                printBus();
+                if (choice == 0) {
+                    System.out.println("Thank you for using our service!");
+                    break;
+                }else if (choice == 1) {
+                    busWindowSeatChoice();
+                }else if (choice == 2) {
+                    findCustomerBooked();
+                }else if (choice == 3) {
+                    printBus();
+                }
+            }catch (Exception e) {
+                System.out.println("Please choose an appropriate actions.");
             }
         }
     }
 
+    /**
+     * Prompt the user for their birthdate and display any found customer booking data.
+     */
     public static void findCustomerBooked() {
         while (true) {
+            System.out.println("0.Exit");
             System.out.print("Please provide your birthdate(YYYYMMDD): ");
             String dateOfBirth = scanner.next();
+
+            if (dateOfBirth.equals("0")) {
+                break;
+            }
             if (dateOfBirth.length() == 8) {
-                System.out.println(findCustomerData(formatDateOfBirth(dateOfBirth)));
+                System.out.println(findCustomerData(dateOfBirth));
             }
         }
     }
-
+    /**
+     * Finds and returns customer data depending on the provided birthdate.
+     *
+     * @param birthdate The birthdate of the customer to do the search with.
+     * @return A formatted string containing customer details, or a message if no booking exists with the birthdate.
+     */
     public static String findCustomerData(String birthdate) {
         StringBuilder stringBuilder = new StringBuilder();
         for (String[] busSeat : busSeats) {
             for (int j = 0; j < 4; j += 3) {
                 String data = busSeat[j];
                 if (splittedString(data)[0].equals("X")) {
-                    if (splittedString(data)[0].equals(formatDateOfBirth(birthdate))) {
+                    if (splittedString(data)[3].trim().equals(formatDateOfBirth(birthdate))) {
                         stringBuilder.append(formattedCustomerDetails(data));
                         break;
                     }
                 }
             }
+        }
+
+        if (stringBuilder.isEmpty()) {
+            stringBuilder.append("No booking was found");
         }
 
         return stringBuilder.toString();
@@ -94,7 +123,7 @@ public class Main {
      * Menu of choices for the Bus Inspector role.
      * Displays menu options, takes user input, and performs actions according to it.
      * Check profit calls recursive function to get the total profit made.
-     * Sort customers uses recursive
+     * Sort customers
      */
     public static void busInspectorChoices() {
         while (true) {
@@ -104,16 +133,20 @@ public class Main {
             System.out.println("3.Show bus seats");
             System.out.println("> ");
 
-            int choice = scanner.nextInt();
-            if (choice == 0) {
-                break;
-            }else if (choice == 1) {
-                double profit = getTotalProfit(0, 0, 0.0);
-                System.out.println("Current profit is " + profit + " KR");
-            }else if (choice == 2) {
+            try {
+                int choice = scanner.nextInt();
+                if (choice == 0) {
+                    break;
+                }else if (choice == 1) {
+                    double profit = getTotalProfit(0, 0, 0.0);
+                    System.out.println("Current profit is " + profit + " KR");
+                }else if (choice == 2) {
 
-            }else if (choice == 3) {
-                printBus();
+                }else if (choice == 3) {
+                    printBus();
+                }
+            }catch (Exception e) {
+                System.out.println("Please choose an action.");
             }
         }
     }
@@ -136,7 +169,7 @@ public class Main {
 
             int choice = scanner.nextInt();
 
-            if (choice >= 1 && choice <= 20) {
+            if (choice >= 1 && choice <= 20 && !seatAlreadyExists(choice)) {
                 System.out.print("First name: ");
                 String firstName = scanner.next();
 
@@ -151,6 +184,22 @@ public class Main {
             }
         }
 
+    }
+
+    public static boolean seatAlreadyExists(int choice) {
+        for (String[] seat : busSeats) {
+            for (int j = 0; j < 4; j++) {
+                if (splittedString(seat[j])[0].equals("X")) {
+                    int busSeat = Integer.parseInt(splittedString(seat[j])[4]);
+                    if (busSeat == choice) {
+                        System.out.println("Seat number has already been booked.");
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -224,14 +273,17 @@ public class Main {
             System.out.println("1.Bus Inspector ");
             System.out.println("2.Customer ");
             System.out.print("> ");
-            int choice = scanner.nextInt();
-
-            if (choice == 1) {
-                return 1;
-            }else if (choice == 2) {
-                return 2;
-            }else {
-                break;
+            try {
+                int choice = scanner.nextInt();
+                if (choice == 1) {
+                    return 1;
+                }else if (choice == 2) {
+                    return 2;
+                }else {
+                    break;
+                }
+            } catch (Exception e) {
+                System.out.println("Choose a number please.");
             }
         }
         return 0;
@@ -333,10 +385,10 @@ public class Main {
                 dateOfBirth.substring(6, 8);
     }
 
-
     /**
      * Prints full name, birthdate, and seat number formatted from customer details extracted from CSV string
      * @param csvString CSV string containing customer details.
+     * @return Formatted customer details in an order.
      */
     public static String formattedCustomerDetails(String csvString) {
         return "Name: " + getFullName(csvString) +
@@ -451,7 +503,6 @@ public class Main {
             System.out.print("\n()------------()");
         }
     }
-
 
     /**
      * Print the front of the bus through multiple System.out.println()
