@@ -35,6 +35,8 @@ public class Main {
                 case 1 -> busInspectorChoice();
                 case 2 -> customerBusSeatChoice();
                 case 0 -> {
+                    System.out.println("Thanks for using our service!");
+                    return;
                 }
             }
         }
@@ -49,19 +51,21 @@ public class Main {
             printCustomerChoices();
             try {
                 int choice = scanner.nextInt();
-                switch (choice) {
-                    case 0 -> {
-                        startBusService();
-                        return;
-                    }
-                    case 1 -> busWindowSeatChoice();
-                    case 2 -> findCustomerBooked();
-                    case 3 -> printBus();
-                    default -> printError("Customer: Please choose an appropriate action");
+
+                if (choice == 0){
+                    break;
+                }else if (choice == 1) {
+                    busWindowSeatChoice();
+                }else if (choice == 2) {
+                    findCustomerBooked();
+                }else if (choice == 3) {
+                    printBus();
+                }else {
+                    printError("Please provide a reasonable option.");
                 }
 
             }catch (Exception e) {
-                scanner.next();
+                scanner.nextInt();
                 printError("customer");
             }
         }
@@ -87,6 +91,7 @@ public class Main {
             if (dateOfBirth.equals("0")) {
                 break;
             }
+
             if (dateOfBirth.length() == 8) {
                 System.out.println(findCustomerData(dateOfBirth));
             }
@@ -124,22 +129,22 @@ public class Main {
             printBusInspectorChoices();
             try {
                 int inspectorChoice = scanner.nextInt();
-                switch (inspectorChoice) {
-                    case 0 -> {
-                        startBusService();
-                        return;
-                    }
-                    case 1 -> {
-                        double profit = calculateProfit(0, 0, 0.0);
-                        System.out.println("Current profit is " + profit + " KR");
-                    }
-                    case 2 -> printSortedCustomers();
-                    case 3 -> printBus();
-                    default -> printError("Inspector: Please choose an appropriate action.");
+
+                if (inspectorChoice == 0) {
+                    break;
+                }else if (inspectorChoice == 1) {
+                    double profit = calculateProfit(0, 0, 0.0);
+                    System.out.println("Current profit is " + profit + " KR");
+                }else if (inspectorChoice == 2) {
+                    printSortedCustomers();
+                }else if (inspectorChoice == 3) {
+                    printBus();
+                }else {
+                    System.out.println("Please choose one of the above.");
                 }
 
             }catch (Exception e) {
-                scanner.nextLine();
+                scanner.next();
                 printError("inspector");
             }
         }
@@ -195,8 +200,12 @@ public class Main {
     }
 
     public static void printSortedCustomers() {
-        for (String customer: sortCustomers()) {
-            System.out.println(getFormattedCustomerDetails(customer));
+        if (getAvailableSeats() <= 18) {
+            for (String customer: sortCustomers()) {
+                System.out.println(getFormattedCustomerDetails(customer));
+            }
+        }else {
+            System.out.println(getFormattedCustomerDetails(sortCustomers()[0]));
         }
     }
 
@@ -211,7 +220,8 @@ public class Main {
             try {
                 int choice = scanner.nextInt();
 
-                if ((choice >= 1 && choice <= 20) && !checkSeatAlreadyBooked(choice)) {
+                if (choice >= 1 && choice <= 20 && !checkSeatAlreadyBooked(choice)) {
+
                     System.out.print("First name: ");
                     String firstName = scanner.next();
 
@@ -241,7 +251,7 @@ public class Main {
     public static boolean checkSeatAlreadyBooked(int choice) {
         for (String[] seat : seats) {
                 for (int j = 0; j < 4; j++) {
-                if (!checkBookedSeat(seat[j])) {
+                if (checkBookedSeat(seat[j])) {
                     int busSeat = Integer.parseInt(getSeatNumber(seat[j]));
                     if (busSeat == choice) {
                         System.out.println("Seat number has already been booked.");
@@ -417,6 +427,7 @@ public class Main {
 
         if (seat.length() > 2) {
             int age = getAge(seat);
+            System.out.println(age);
 
             if (age >= 18) {
                 return 0;
