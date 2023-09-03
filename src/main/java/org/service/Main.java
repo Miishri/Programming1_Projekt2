@@ -133,7 +133,8 @@ public class Main {
                 if (inspectorChoice == 0) {
                     break;
                 }else if (inspectorChoice == 1) {
-                    double profit = calculateProfit(0, 0, 0.0);
+                    double profit = getProfit();
+
                     System.out.println("Current profit is " + profit + " KR");
                 }else if (inspectorChoice == 2) {
                     printSortedCustomers();
@@ -144,10 +145,18 @@ public class Main {
                 }
 
             }catch (Exception e) {
-                scanner.next();
+                scanner.nextLine();
                 printError("inspector");
             }
         }
+    }
+
+    public static double getProfit() {
+        double profit = 0.0;
+
+        profit = getTotalProfit(0, 0, profit);
+
+        return profit;
     }
 
     public static void printBusInspectorChoices() {
@@ -161,7 +170,7 @@ public class Main {
 
     public static String[] sortCustomers() {
         String[] customerArray = getCustomerSingleArray();
-        for (int i = 0; i < customerArray.length; i++) {
+        for (int i = 0; i < customerArray.length - 1; i++) {
             if (getAge(customerArray[i]) > getAge(customerArray[i + 1])) {
                 String tempCustomer = customerArray[i];
                 customerArray[i] = customerArray[i + 1];
@@ -175,7 +184,7 @@ public class Main {
         String[] singleArray = new String[0];
         for (String[] seat : seats) {
             for (int j = 0; j < 4; j++) {
-                if (!checkBookedSeat(seat[j])) {
+                if (checkBookedSeat(seat[j])) {
                     singleArray = add(seat[j], singleArray);
                 }
             }
@@ -204,7 +213,7 @@ public class Main {
             for (String customer: sortCustomers()) {
                 System.out.println(getFormattedCustomerDetails(customer));
             }
-        }else {
+        }else if (getAvailableSeats() == 19){
             System.out.println(getFormattedCustomerDetails(sortCustomers()[0]));
         }
     }
@@ -219,6 +228,10 @@ public class Main {
             printWindowSeatChoices();
             try {
                 int choice = scanner.nextInt();
+
+                if (choice == 0) {
+                    break;
+                }
 
                 if (choice >= 1 && choice <= 20 && !checkSeatAlreadyBooked(choice)) {
 
@@ -236,13 +249,14 @@ public class Main {
                 }
             } catch (Exception e) {
                 scanner.next();
-                printError("birthdate");
+                printError("Please choose an unbooked seat.");
             }
         }
 
     }
 
     public static void printWindowSeatChoices() {
+        System.out.println("0.Exit");
         System.out.println("Window seats unbooked are:" + getUnbookedWindowSeats());
         System.out.println("1. Which seat to book? (1-20)");
         System.out.print("> ");
@@ -427,7 +441,6 @@ public class Main {
 
         if (seat.length() > 2) {
             int age = getAge(seat);
-            System.out.println(age);
 
             if (age >= 18) {
                 return 0;
@@ -460,25 +473,35 @@ public class Main {
 
     /**
      * Recursively calculates the profit within a 2D array using the currentAgeCheck() function.
-     * @param currentRow The current currentRow index, starting from 0 up to array.length.
+     *
+     * @param currentRow    The current currentRow index, starting from 0 up to array.length.
      * @param currentColumn The current currentColumn index within the currentRow, accessed through the 2D array.
-     * @param profit The total profit calculated so far.
+     * @param profit The current totalProfit
      * @return The calculated profit as a double value.
      */
-    public static double calculateProfit(int currentRow, int currentColumn, double profit) {
-        int ageValidator = currentAgeCheck(seats[currentRow][currentColumn]);
+    public static double getTotalProfit(int currentRow, int currentColumn, double profit) {
 
         if (currentRow >= seats.length) return profit;
 
-        if (currentColumn > 3) return calculateProfit(currentRow + 1, 0, profit);
 
-        if (ageValidator == 0) {
-            return calculateProfit(currentRow, currentColumn + 1, profit + 149.90);
-        }else if (ageValidator == 1){
-            return calculateProfit(currentRow, currentColumn + 1, profit + 299.90);
+        double seatPrice =  0.0;
+
+        if (currentColumn < 3) {
+            String seat = seats[currentRow][currentColumn];
+            if (checkBookedSeat(seat)) {
+                int ageValidator = currentAgeCheck(seat);
+
+                if (ageValidator == 0) {
+                    seatPrice = 299.90;
+                }else if (ageValidator == 1){
+                    seatPrice = 149.90;
+                }
+            }
+        }else {
+            return getTotalProfit(currentRow + 1, 0, profit + seatPrice);
         }
 
-        return calculateProfit(currentRow, currentColumn + 1, profit);
+        return getTotalProfit(currentRow, currentColumn + 1, profit + seatPrice);
     }
 
     /**
@@ -546,7 +569,7 @@ public class Main {
         if (seat.length() <= 2 && !seat.isEmpty()) {
             System.out.printf("|%2s|", seat);
         }else {
-            System.out.printf("|%2s", checkBookedSeat(seat));
+            System.out.printf("|%2s", "X");
         }
     }
 
