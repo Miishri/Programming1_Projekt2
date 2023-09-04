@@ -189,8 +189,8 @@ public class Main {
                 }
 
             }catch (Exception e) {
-                scanner.nextInt();
-                printError("customer");
+                scanner.next();
+                printError("Please choose an existing action");
             }
         }
     }
