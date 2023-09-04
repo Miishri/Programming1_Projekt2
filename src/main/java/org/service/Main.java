@@ -655,7 +655,7 @@ public class Main {
     /**
      * Takes in a string that is formatted in CSV to extract the date of birth (YYYYMMDD) and reformat it to (YYYY-MM-DD).
      * @param birthdate CSV formatted details about the customer.
-     * @return Returns the reformatted date of birth.
+     * @return Returns the reformatted birthdate
      */
     public static String formatBirthdate(String birthdate) {
         return birthdate.substring(0, 4) + "-" +
