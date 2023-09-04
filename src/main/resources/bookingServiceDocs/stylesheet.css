@@ -2,8 +2,6 @@
  * Javadoc style sheet
  */
 
-@import url('resources/fonts/dejavu.css');
-
 /*
  * Styles for individual HTML elements.
  *
@@ -646,7 +644,7 @@ ul.ui-autocomplete  li {
     position:relative;
     left:-4px;
     top:-4px;
-    font-size:0px;
+    font-size:0;
 }
 .watermark {
     color:#545454;
@@ -679,7 +677,7 @@ section.class-description {
 }
 .summary section[class$="-summary"], .details section[class$="-details"],
 .class-uses .detail, .serialized-class-details {
-    padding: 0px 20px 5px 10px;
+    padding: 0 20px 5px 10px;
     border: 1px solid #ededed;
     background-color: #f8f8f8;
 }
