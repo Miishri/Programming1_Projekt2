@@ -190,7 +190,7 @@ public class Main {
 
             }catch (Exception e) {
                 scanner.next();
-                printError("Please choose an existing action");
+                printError("Please choose an existing actiona");
             }
         }
     }
