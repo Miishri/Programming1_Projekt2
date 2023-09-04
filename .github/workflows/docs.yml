@@ -26,3 +26,4 @@ jobs:
         uses: peaceiris/actions-gh-pages@v3
         with:
           publish_dir: src/main/resources/docs
+          github_token: ${{ secrets.programming }}
