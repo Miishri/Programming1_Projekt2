@@ -20,7 +20,7 @@ jobs:
           distribution: 'adopt'
 
       - name: Build JavaDocs
-        run: javadoc -d doc -sourcepath src/main/resources src/main/java/org/service/Main.java
+        run: javadoc -d doc -sourcepath src/main/java src/main/java/org/service/Main.java
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v3
