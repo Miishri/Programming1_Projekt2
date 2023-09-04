@@ -1,0 +1,28 @@
+name: JavaDocs build
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Java
+        uses: actions/setup-java@v2
+        with:
+          java-version: '17' 
+
+      - name: Build JavaDocs
+        run: javadoc -d doc -sourcepath src/main/java/org/service/Main.java
+
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          publish_dir: src/main/resources/docs
+          github_token: ${{ secrets.GITHUB_TOKEN }}
