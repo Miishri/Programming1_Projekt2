@@ -72,7 +72,7 @@ public class Main {
                 }
             } catch (Exception e) {
                 scanner.next();
-                printError("role");
+                printError("Choose an appropriate role");
             }
         }
     }
@@ -190,7 +190,7 @@ public class Main {
 
             }catch (Exception e) {
                 scanner.next();
-                printError("Please choose an existing actiona");
+                printError("Please choose an existing action");
             }
         }
     }
@@ -210,6 +210,8 @@ public class Main {
 
             if (dateOfBirth.length() == 8) {
                 System.out.println(findCustomerData(dateOfBirth));
+            }else {
+                System.out.println("Please provide a reasonable birthdate.");
             }
         }
     }
