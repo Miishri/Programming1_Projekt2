@@ -1,6 +1,7 @@
 package org.service;
 
 import java.time.Year;
+import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -8,6 +9,7 @@ import java.util.Scanner;
  */
 public class Main {
     static Scanner scanner = new Scanner(System.in);
+
     static String[][] seats = {
             {"1","2","3","4"},
             {"5","6","7","8"},
@@ -163,6 +165,7 @@ public class Main {
         System.out.println("1.Book seat");
         System.out.println("2.Find your booking");
         System.out.println("3.Show bus");
+        System.out.println("4.Cancel booking");
         System.out.print("> ");
     }
 
@@ -184,6 +187,8 @@ public class Main {
                     findBookedCustomer();
                 }else if (choice == 3) {
                     printBus();
+                }else if (choice == 4) {
+                    cancelBooking();
                 }else {
                     printError("Please provide a reasonable option.");
                 }
@@ -436,13 +441,16 @@ public class Main {
     }
 
     /**
-     * Books a specific seat in the bus layout.
+     * Book or remove a specific seat in the bus layout.
      * @param seat The seat to be booked.
      */
     public static void bookSeat(String seat) {
         for (int i = 0; i < seats.length; i++) {
             for (int j = 0; j < 4; j++) {
-                if (seats[i][j].equals(getSeatNumber(seat))) {
+                if (seat.length() == 1 && getSeatNumber(seats[i][j]).equals(seat)) {
+                    seats[i][j] = seat;
+                    return;
+                }else if (seats[i][j].equals(getSeatNumber(seat))) {
                     seats[i][j] = seat;
                 }
             }
@@ -537,6 +545,9 @@ public class Main {
      * @return Returns the booked seat number.
      * */
     public static String getSeatNumber(String seat) {
+        if (seat.length() == 1) {
+            return seat;
+        }
         return getCustomerDetails(seat)[4];
     }
 
@@ -629,6 +640,36 @@ public class Main {
         profit = getTotalProfit(0, 0, profit);
 
         return profit;
+    }
+
+    /**
+     * Cancels a booking based on the customer's birthdate.
+     */
+    public static void cancelBooking() {
+
+        while (true) {
+            System.out.println("0.Exit");
+            System.out.print("Please provide your birthdate(YYYYMMDD): ");
+            String birthdate = scanner.next();
+
+            if (birthdate.equals("0")) {
+                break;
+            }
+
+            if (birthdate.length() == 8) {
+                for (String[] row: seats) {
+                    for (String seat: row) {
+                        if (checkBookedSeat(seat) && getBirthdate(seat).equals(formatBirthdate(birthdate))) {
+                            bookSeat(getSeatNumber(seat));
+                            System.out.println("Booking has been canceled");
+                        }
+                    }
+                }
+
+            }else {
+                System.out.println("Booking was not found");
+            }
+        }
     }
 
     /**
