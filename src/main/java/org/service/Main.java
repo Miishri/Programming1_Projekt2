@@ -226,9 +226,35 @@ public class Main {
      */
     public static void printWindowSeatChoices() {
         System.out.println("0.Exit");
-        System.out.println("Window seats unbooked are:" + getUnbookedWindowSeats());
+        System.out.println("Window seats unbooked are: " + getUnbookedWindowSeats());
         System.out.println("1. Which seat to book? (1-20)");
         System.out.print("> ");
+    }
+
+    /**
+     * Checks if the customer wants to book a window seat.
+     *
+     * @return true if the customer wants a window seat; false otherwise.
+     */
+    public static Boolean windowSeatCheck() {
+        System.out.println("Would you like to book a window seat? (Yes/No)");
+        String windowSeat = scanner.next();
+
+        return windowSeat.equalsIgnoreCase("yes") && !getUnbookedWindowSeats().isEmpty();
+    }
+
+    /**
+     * Books an automatic window seat for a customer.
+     *
+     * @return true if booking is successful, false otherwise.
+     */
+    public static boolean bookAutomaticWindowSeat() {
+        String[] customerDetails = requestCustomerDetails();
+        if (customerDetails.length == 1) {
+            return false;
+        }
+
+        return submitCustomerDetails(customerDetails[0], customerDetails[1], customerDetails[2], getRandomUnbookedWindowSeat());
     }
 
     /**
@@ -258,34 +284,68 @@ public class Main {
      */
     public static void busWindowSeatChoice() {
         while (true) {
-            printWindowSeatChoices();
             try {
-                int choice = scanner.nextInt();
+                if (windowSeatCheck()) {
+                    if (bookAutomaticWindowSeat()) {
+                        break;
+                    }
+                }
 
+                printWindowSeatChoices();
+
+                int choice = scanner.nextInt();
                 if (choice == 0) {
                     break;
                 }
 
                 if (choice >= 1 && choice <= 20 && !checkSeatAlreadyBooked(choice)) {
-
-                    System.out.print("First name: ");
-                    String firstName = scanner.next();
-
-                    System.out.print("Last name: ");
-                    String lastName = scanner.next();
-
-                    System.out.print("Birthdate(YYYYMMDD): ");
-                    String dateOfBirth = scanner.next();
-                    if (submitCustomerDetails(firstName, lastName, dateOfBirth, choice)) {
+                    if (bookAutomaticWindowSeat()) {
                         break;
                     }
                 }
+
             } catch (Exception e) {
-                scanner.next();
                 printError("Please choose an unbooked seat.");
             }
         }
 
+    }
+
+    /**
+     * Gets a random unbooked window seat number.
+     *
+     * @return a random unbooked window seat number as an integer.
+     */
+    public static int getRandomUnbookedWindowSeat() {
+       String[] windowSeats = getUnbookedWindowSeats().split(" ");
+        for (int i = 0; i < windowSeats.length; i++) {
+            windowSeats[i] = windowSeats[i].trim();
+        }
+        return Integer.parseInt(windowSeats[(int) (Math.random() + (windowSeats.length - 1))]);
+    }
+
+    /**
+     * Gets a random unbooked window seat number.
+     *
+     * @return a random unbooked window seat number as an integer.
+     */
+    public static String[] requestCustomerDetails() {
+        try {
+            System.out.print("First name: ");
+            String firstName = scanner.next();
+
+            System.out.print("Last name: ");
+            String lastName = scanner.next();
+
+            System.out.print("Birthdate(YYYYMMDD): ");
+            String dateOfBirth = scanner.next();
+
+            return new String[]{firstName, lastName, dateOfBirth};
+        }catch(Exception e) {
+            System.out.println("Please provide correct details");
+        }
+
+        return new String[]{"Empty"};
     }
 
     /**
@@ -315,7 +375,8 @@ public class Main {
         System.out.println("0.Exit");
         System.out.println("1.Check profit");
         System.out.println("2.Sort customers");
-        System.out.println("3.Show bus seats");
+        System.out.println("3.Display customers");
+        System.out.println("4.Show bus seats");
         System.out.print("> ");
     }
 
@@ -340,6 +401,8 @@ public class Main {
                 }else if (inspectorChoice == 2) {
                     printSortedCustomers();
                 }else if (inspectorChoice == 3) {
+                    displayAllCustomers();
+                }else if (inspectorChoice == 4) {
                     printBus();
                 }else {
                     System.out.println("Please choose one of the above.");
@@ -347,7 +410,7 @@ public class Main {
 
             }catch (Exception e) {
                 scanner.nextLine();
-                printError("inspector");
+                printError("Error occurred inside inspector choices");
             }
         }
     }
@@ -362,6 +425,7 @@ public class Main {
             System.out.println(getFormattedCustomerDetails(sortCustomers()[0]));
         }
     }
+
 
     /**
      * Sorts customers' seat details by age in older to younger.
@@ -378,6 +442,19 @@ public class Main {
             }
         }
         return customerArray;
+    }
+
+    /**
+     * Displays the details of all booked customers.
+     */
+    public static void displayAllCustomers() {
+        for (String[] customer: seats) {
+            for (int i = 0; i < 4; i++) {
+                if (checkBookedSeat(customer[i])) {
+                    System.out.println(getFormattedCustomerDetails(customer[i]));
+                }
+            }
+        }
     }
 
     /**
@@ -463,10 +540,14 @@ public class Main {
      */
     public static String getUnbookedWindowSeats() {
         String windowSeats = "";
-        for (String[] busSeat : seats) {
+        for (int i = 0; i < seats.length; i += 1) {
             for (int j = 0; j < 4; j += 3) {
-                if (!checkBookedSeat(busSeat[j])) {
-                    windowSeats += " " + busSeat[j];
+                if (!checkBookedSeat(seats[i][j])) {
+                    if (i == 0) {
+                        windowSeats += seats[i][j];
+                    }else {
+                        windowSeats += " " + seats[i][j];
+                    }
                 }
             }
         }
@@ -484,9 +565,11 @@ public class Main {
      * @return Formatted customer details in an order.
      */
     public static String getFormattedCustomerDetails(String csv) {
-        return "Name: " + getFullName(csv) +
+        return "---------INFO----------" +
+                "\nName: " + getFullName(csv) +
                 "\nBirthdate: "  + getCustomerDetails(csv)[3]+
-                "\nSeat: " + getSeatNumber(csv);
+                "\nSeat: " + getSeatNumber(csv) +
+                "\n-----------------------";
     }
 
     /**
