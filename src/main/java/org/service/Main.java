@@ -1,7 +1,6 @@
 package org.service;
 
 import java.time.Year;
-import java.util.Arrays;
 import java.util.Scanner;
 
 /**
@@ -518,17 +517,28 @@ public class Main {
     }
 
     /**
-     * Book or remove a specific seat in the bus layout.
+     * Book a specific seat in the bus layout.
      * @param seat The seat to be booked.
      */
     public static void bookSeat(String seat) {
         for (int i = 0; i < seats.length; i++) {
             for (int j = 0; j < 4; j++) {
-                if (seat.length() == 1 && getSeatNumber(seats[i][j]).equals(seat)) {
+                if (seats[i][j].equals(getSeatNumber(seat))) {
                     seats[i][j] = seat;
-                    return;
-                }else if (seats[i][j].equals(getSeatNumber(seat))) {
-                    seats[i][j] = seat;
+                }
+            }
+        }
+    }
+
+    /**
+     * Remove a specific seat in the bus layout.
+     * @param seatNumber The seat to be unbooked.
+     */
+    public static void cancelBooking(String seatNumber) {
+        for (int i = 0; i < seats.length; i++) {
+            for (int j = 0; j < 4; j++) {
+                if (getSeatNumber(seats[i][j]).equals(seatNumber) && checkBookedSeat(seats[i][j])) {
+                    seats[i][j] = seatNumber;
                 }
             }
         }
@@ -543,7 +553,7 @@ public class Main {
         for (int i = 0; i < seats.length; i += 1) {
             for (int j = 0; j < 4; j += 3) {
                 if (!checkBookedSeat(seats[i][j])) {
-                    if (i == 0) {
+                    if (i == 0 && j != 3) {
                         windowSeats += seats[i][j];
                     }else {
                         windowSeats += " " + seats[i][j];
@@ -628,7 +638,7 @@ public class Main {
      * @return Returns the booked seat number.
      * */
     public static String getSeatNumber(String seat) {
-        if (seat.length() == 1) {
+        if (seat.length() <= 2) {
             return seat;
         }
         return getCustomerDetails(seat)[4];
@@ -726,10 +736,9 @@ public class Main {
      * Cancels a booking based on the customer's birthdate.
      */
     public static void cancelBooking() {
-
         while (true) {
             System.out.println("0.Exit");
-            System.out.print("Please provide your birthdate(YYYYMMDD): ");
+            System.out.println("Please provide your birthdate(YYYYMMDD): ");
             String birthdate = scanner.next();
 
             if (birthdate.equals("0")) {
@@ -739,13 +748,14 @@ public class Main {
             if (birthdate.length() == 8) {
                 for (String[] row: seats) {
                     for (String seat: row) {
-                        if (checkBookedSeat(seat) && getBirthdate(seat).equals(formatBirthdate(birthdate))) {
-                            bookSeat(getSeatNumber(seat));
-                            System.out.println("Booking has been canceled");
+                        if (checkBookedSeat(seat)) {
+                            if (getBirthdate(seat).equals(formatBirthdate(birthdate))) {
+                                cancelBooking(getSeatNumber(seat));
+                                System.out.println("Booking has been canceled");
+                            }
                         }
                     }
                 }
-
             }else {
                 System.out.println("Booking was not found");
             }
