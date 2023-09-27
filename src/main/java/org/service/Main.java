@@ -652,7 +652,6 @@ public class Main {
      * @return 0 if the calculated age is 18 or older, 1 if it's younger than 18, and 2 if unable to determine.
      */
     public static int currentAgeCheck(String seat) {
-
         if (seat.length() > 2) {
             int age = getAge(seat);
 
@@ -694,7 +693,7 @@ public class Main {
 
         double seatPrice =  0.0;
 
-        if (currentColumn < 3) {
+        if (currentColumn <= 3) {
             String seat = seats[currentRow][currentColumn];
             if (checkBookedSeat(seat)) {
                 int ageValidator = currentAgeCheck(seat);
@@ -719,9 +718,7 @@ public class Main {
      */
     public static double getProfit() {
         double profit = 0.0;
-
         profit = getTotalProfit(0, 0, profit);
-
         return profit;
     }
 
